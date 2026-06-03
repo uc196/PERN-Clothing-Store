@@ -1,23 +1,20 @@
 {
   "compilerOptions": {
-    // Environment Settings
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
-    "target": "ES2020",
-    "types": ["node"],
-
-    // File Layout
-    "rootDir": "./",
+    "module": "NodeNext",
+    "target": "ESNext",
+    "types": [],
+    "moduleResolution": "NodeNext",
     "outDir": "./dist",
-
-    // Strict Type Checking
+    "rootDir": "./src",
     "strict": true,
-
-    // Compatibility & Safety
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["./**/*.ts"],
-  "exclude": ["node_modules", "dist"]
+  "include": [
+    "./src/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

@@ -1,18 +1,30 @@
-import express ,{ Request , Response } from 'express' ;
-import cors from 'cors' ;
-import "dotenv/config" ;
+import "dotenv/config";
+import express, { Request, Response } from "express";
+import cors from "cors";
+import { PrismaClient } from "@prisma/client";
 
-const app = express() ;
+const app = express();
 
-app.use(cors()) ;
-app.use(express.json()) ;
+const prisma = new PrismaClient();
 
-const PORT = process.env.PORT || 5000 ;
+app.use(cors());
+app.use(express.json());
 
-app.get('/' , (req : Request , res : Response) => {
-    res.json({ message : "Hello from the server!" }) ;
-}) ;
+const PORT = process.env.PORT || 5000;
 
-app.listen(PORT , () => {
-    console.log(`Server is running on port ${PORT}`) ;
-}) ;
+// app.get("/", (req: Request, res: Response) => {
+//   res.send("Hello World!");
+// });
+
+app.get("/db-test", async (req, res) => {
+  try {
+    await prisma.$connect();
+    res.json({ status: "DB CONNECTED ✅" });
+  } catch (err) {
+    res.status(500).json({ status: "DB FAILED ❌", error: err });
+  }
+});
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
