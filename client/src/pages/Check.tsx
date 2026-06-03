@@ -26,7 +26,6 @@ const Check = () => {
     email: "user@example.com",
   };
 
-  // PLACE ORDER (NO PAYSTACK)
   const handlePlaceOrder = () => {
     if (!selectedAddress) {
       alert("Please select a delivery address");
@@ -47,8 +46,7 @@ const Check = () => {
     console.log("ORDER:", orderPayload);
 
     setTimeout(() => {
-      clearCart(); // empty cart after order
-
+      clearCart(); 
       setLoading(false);
       setStep("success");
     }, 1000);

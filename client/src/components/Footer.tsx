@@ -35,7 +35,6 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* COMPANY */}
           <div>
             <h3 className="font-semibold text-lg mb-4">Company</h3>
             <ul className="space-y-2 text-sm text-gray-300">
@@ -46,7 +45,6 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* SUPPORT */}
           <div>
             <h3 className="font-semibold text-lg mb-4">Support</h3>
             <ul className="space-y-2 text-sm text-gray-300">
@@ -59,7 +57,6 @@ const Footer = () => {
 
         </div>
 
-        {/* BOTTOM BAR */}
         <div className="border-t border-green-900 mt-10 pt-6 text-center text-sm text-gray-300">
           © {new Date().getFullYear()} InstaWear. All rights reserved.
         </div>
