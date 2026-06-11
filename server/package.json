@@ -1,6 +1,6 @@
 {
     "scripts": {
-        "postinstall": "npx generate prisma",
+        "postinstall": "npx prisma generate",
         "dev": "tsx watch server.ts",
         "build": "tsc",
         "start": "node dist/server.js"
