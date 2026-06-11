@@ -1,11 +1,11 @@
 import Express from "express";
 import {
   createOrder,
-  getUserOrders,
-  getOrder,
-  updateOrderStatus,
   getAllOrders,
+  getOrder,
   getOrderLocation,
+  getUserOrders,
+  updateOrderStatus
 } from "../controllers/orderController.js";
 import  auth  from "../middleware/auth.js";
 import { admin } from "../middleware/admin.js";
