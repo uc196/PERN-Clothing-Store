@@ -1,11 +1,10 @@
 {
 "scripts": {
-"postinstall": "prisma generate --schema=src/prisma/schema.prisma",
-  "dev": "tsx watch server.ts",
+     "postinstall": "node node_modules/prisma/build/index.js generate --schema=src/prisma/schema.prisma",
+    "dev": "tsx watch server.ts",
   "build": "tsc",
   "start": "node dist/server.js"
-},
-    "dependencies": {
+}, "dependencies": {
         "@prisma/adapter-neon": "^7.8.0",
         "@prisma/client": "^6.19.3",
         "bcrypt": "^6.0.0",
