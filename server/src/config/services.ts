@@ -15,7 +15,7 @@ type SendEmailParams = {
 export const sendEmail = async ({ to, subject, html }: SendEmailParams) => {
   try {
     const { data, error } = await resend.emails.send({
-      from: "onboarding@resend.dev",
+      from: process.env.RESEND_FROM_EMAIL ?? "onboarding@resend.dev",
       to,
       subject,
       html,
