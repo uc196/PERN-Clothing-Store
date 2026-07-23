@@ -1,13 +1,13 @@
 export interface User {
-    _id: string;
-    name: string;
-    email: string;
-    phone: string;
-    avatar: string;
-    addresses: Address[];
-    isAdmin?: boolean;
-    createdAt: string;
-    updatedAt: string;
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  avatar?: string;
+  addresses: Address[];
+  isAdmin?: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Address {
@@ -29,6 +29,7 @@ export interface Category {
 }
 
 export interface Product {
+    id:string
   _id: string
   name: string
   description: string

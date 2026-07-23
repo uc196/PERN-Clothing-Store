@@ -1,23 +1,41 @@
 import { useState } from "react"
-import { Mail, Lock, User, Loader2Icon } from "lucide-react"
+import { Mail, Lock, User, Phone, Loader2Icon } from "lucide-react"
+import { useAuth } from "../context/authcontext"
+import { useNavigate } from "react-router-dom"
 
 const Login = () => {
+
+  const { login, register } = useAuth()
+  const navigate = useNavigate()
 
   const [isLogin, setIsLogin] = useState(true)
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
+  const [phone, setPhone] = useState("")
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
+    setError("")
     setLoading(true)
 
-    setTimeout(() => {
+    try {
+      if (isLogin) {
+        await login({ email, password })
+      } else {
+        await register({ name, email, phone, password })
+      }
+         navigate("/")
+    } catch (err: any) {
+      const message =
+        err?.response?.data?.message ||
+        "Something went wrong. Please try again."
+      setError(message)
+    } finally {
       setLoading(false)
-      window.location.href = "/"
-    }, 2000)
+    }
   }
 
   return (
@@ -66,6 +84,12 @@ const Login = () => {
             </p>
           </div>
 
+          {error && (
+            <div className="mb-5 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3">
+              {error}
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-5">
 
             {/* Name */}
@@ -87,6 +111,31 @@ const Login = () => {
                     placeholder="Enter your name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
+                    className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-black"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Phone (register only) */}
+            {!isLogin && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Phone Number
+                </label>
+
+                <div className="relative">
+                  <Phone
+                    size={18}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                  />
+
+                  <input
+                    type="tel"
+                    required
+                    placeholder="Enter your phone number"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
                     className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-black"
                   />
                 </div>
@@ -131,6 +180,7 @@ const Login = () => {
                 <input
                   type="password"
                   required
+                  minLength={6}
                   placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -177,7 +227,10 @@ const Login = () => {
               : "Already have an account?"}
 
             <button
-              onClick={() => setIsLogin(!isLogin)}
+              onClick={() => {
+                setIsLogin(!isLogin)
+                setError("")
+              }}
               className="ml-2 font-semibold text-black hover:underline"
             >
               {isLogin ? "Register" : "Login"}

@@ -37,13 +37,14 @@ export const registerUser = async (req: Request, res: Response) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = await prisma.user.create({
-      data: {
-        name,
-        email: email.toLowerCase(),
-        password: hashedPassword,
-      },
-    });
+  const user = await prisma.user.create({
+  data: {
+    name,
+    email: email.toLowerCase(),
+    password: hashedPassword,
+  },
+  include: { addresses: true },
+});
 
     const { password: _, ...userData } = user;
 
@@ -106,4 +107,40 @@ export const loginUser = async (req: Request, res: Response) => {
     });
   }
 };
+export const getProfile = async (req: Request, res: Response) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({
+        message: "Unauthorized",
+      });
+    }
 
+    const user = await prisma.user.findUnique({
+      where: {
+        id: req.user.id,
+      },
+      include: {
+        addresses: true,
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    const { password, ...userData } = user;
+
+    return res.status(200).json({
+      user: {
+        ...userData,
+        isAdmin: isAdminEmail(userData.email),
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Server error",
+    });
+  }
+};

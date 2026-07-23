@@ -30,75 +30,40 @@ const ProductPage = () => {
   const [featured, setFeatured] = useState<Product[]>([])
   const [quantity, setQuantity] = useState(1)
   const [loading, setLoading] = useState(true)
+  
+useEffect(() => {
+  const loadProduct = async () => {
+    setLoading(true);
 
-  useEffect(() => {
-    const loadProduct = async () => {
-      setLoading(true)
-
-      const found = products.find((p) => p._id === id)
-      if (found) {
-        setProduct(found)
-        setFeatured(products.filter((p) => p._id !== id).slice(0, 5))
-        setLoading(false)
-        return
-      }
-
-      try {
-        const rawId = id?.replace("fs-", "").replace("dj-", "")
-        const isFakeStore = id?.startsWith("fs-")
-        const url = isFakeStore
-          ? `https://fakestoreapi.com/products/${rawId}`
-          : `https://dummyjson.com/products/${rawId}`
-
-        const res = await fetch(url)
-        const data = await res.json()
-
-        const mapped: Product = isFakeStore
-          ? {
-              _id: "fs-" + data.id,
-              name: data.title,
-              description: data.description,
-              price: data.price,
-              originalPrice: data.price + data.price * 0.2,
-              image: data.image,
-              category: data.category,
-              unit: "piece",
-              stock: 10,
-              isOrganic: false,
-              rating: data.rating?.rate || 0,
-              reviewCount: data.rating?.count || 0,
-              discount: 20,
-              createdAt: new Date().toISOString(),
-            }
-          : {
-              _id: "dj-" + data.id,
-              name: data.title,
-              description: data.description,
-              price: data.price,
-              originalPrice: data.price + data.price * 0.2,
-              image: data.thumbnail,
-              category: data.category,
-              unit: "piece",
-              stock: data.stock,
-              isOrganic: false,
-              rating: data.rating,
-              reviewCount: data.stock,
-              discount: 10,
-              createdAt: new Date().toISOString(),
-            }
-
-        setProduct(mapped)
-        setFeatured(products.filter((p) => p._id !== id).slice(0, 5))
-      } catch (err) {
-        console.log("Product fetch error:", err)
-      } finally {
-        setLoading(false)
-      }
+    // 1. Check if the product is already loaded in your global layout context
+    const found = products.find((p) => p.id === id || p._id === id);
+    if (found) {
+      setProduct(found);
+      setFeatured(products.filter((p) => p.id !== id && p._id !== id).slice(0, 5));
+      setLoading(false);
+      return;
     }
 
-    if (id) loadProduct()
-  }, [id, products])
+    // 2. Fetch directly from your local database API endpoint only
+    try {
+      const dbResponse = await fetch(`http://localhost:5000/api/products/${id}`);
+      if (!dbResponse.ok) {
+        throw new Error("Product not found in database");
+      }
+      
+      const dbData = await dbResponse.json();
+      setProduct(dbData);
+      setFeatured(products.filter((p) => p.id !== id && p._id !== id).slice(0, 5));
+    } catch (err) {
+      console.error("Database fetch error:", err);
+      setProduct(null); // Triggers the "Product not found" UI layout safely
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  if (id) loadProduct();
+}, [id, products]);
   if (loading) {
     return (
       <div className="max-w-6xl mx-auto px-5 py-10 grid md:grid-cols-2 gap-10">

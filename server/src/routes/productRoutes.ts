@@ -13,7 +13,7 @@ import {admin} from "../middleware/admin";
 const productRouter = express.Router();
 
 productRouter.get("/getFlashDeals", getFlashDeals);
-productRouter.get("/getProducts", getProducts);
+productRouter.get("/", getProducts);
 productRouter.get("/getProduct/:id", getProductById);
 productRouter.post("/", auth, admin, createProduct);
 productRouter.put("/:id", auth, admin, updateProduct);

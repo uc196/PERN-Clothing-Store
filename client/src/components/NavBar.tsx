@@ -9,21 +9,18 @@ import {
   ShoppingBag,
   Settings,
   Menu,
-  X
+  X,
+  LayoutDashboard
 } from "lucide-react"
 import { useCart } from "../context/CartContext"
+import { useAuth } from "../context/authcontext"
 
 const NavBar = () => {
   const navigate = useNavigate()
 
   const { cartCount, setIsCartOpen } = useCart()
 
-  const [user, setUser] = useState<any>({
-    name: "John Doe",
-    email: "john@email.com",
-    isAdmin: true
-  })
-
+const { user, logout, isAuthenticated } = useAuth();
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
@@ -36,12 +33,12 @@ const NavBar = () => {
     }
   }
 
-  const handleLogout = () => {
-    setUser(null)
-    setUserMenuOpen(false)
-    setMobileMenuOpen(false)
-    navigate("/")
-  }
+const handleLogout = () => {
+  logout();
+  setUserMenuOpen(false);
+  setMobileMenuOpen(false);
+  navigate("/");
+};
 
   const getInitial = (name: string) => name?.charAt(0)?.toUpperCase()
 
@@ -91,22 +88,85 @@ const NavBar = () => {
         </button>
 
         {/* USER */}
-        <div className="hidden md:block relative">
+      <div className="hidden md:block relative">
+  {isAuthenticated && user ? (
+    <>
+      <button
+        onClick={() => setUserMenuOpen(!userMenuOpen)}
+        className="w-10 h-10 rounded-full bg-black text-white flex items-center justify-center font-bold"
+      >
+        {getInitial(user.name)}
+      </button>
 
-          {user ? (
-            <button
-              onClick={() => setUserMenuOpen(!userMenuOpen)}
-              className="w-9 h-9 bg-black text-white rounded-full flex items-center justify-center font-bold"
-            >
-              {getInitial(user.name)}
-            </button>
-          ) : (
-            <Link to="/login" className="text-sm font-medium">
-              Sign In
-            </Link>
-          )}
+      {userMenuOpen && (
+        <div className="absolute right-0 mt-3 w-60 bg-white rounded-xl shadow-xl border overflow-hidden z-50">
 
+          <div className="px-4 py-3 border-b">
+            <h3 className="font-semibold">{user.name}</h3>
+            <p className="text-sm text-gray-500">{user.email}</p>
+          </div>
+
+          <Link
+            to="/profile"
+            className="flex items-center gap-3 px-4 py-3 hover:bg-gray-100"
+          >
+            <Settings size={18} />
+            Profile
+          </Link>
+
+          <Link
+            to="/orders"
+            className="flex items-center gap-3 px-4 py-3 hover:bg-gray-100"
+          >
+            <Package size={18} />
+            Orders
+          </Link>
+
+          <Link
+            to="/addresses"
+            className="flex items-center gap-3 px-4 py-3 hover:bg-gray-100"
+          >
+            <MapPin size={18} />
+            Addresses
+          </Link>
+
+          <Link
+            to="/cart"
+            className="flex items-center gap-3 px-4 py-3 hover:bg-gray-100"
+          >
+            <ShoppingBag size={18} />
+            Cart
+          </Link>
+
+         {user?.isAdmin && (
+    <Link
+        to="/admin" 
+        className="flex items-center gap-3 px-4 py-3 hover:bg-gray-100"
+    >
+        <LayoutDashboard className="size-4" />
+        Admin Panel
+    </Link>
+)}
+
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50"
+          >
+            <LogOut size={18} />
+            Logout
+          </button>
         </div>
+      )}
+    </>
+  ) : (
+    <Link
+      to="/login"
+      className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800"
+    >
+      Sign In
+    </Link>
+  )}
+</div>
 
         {/* MOBILE MENU */}
         <button

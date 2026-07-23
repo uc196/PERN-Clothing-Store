@@ -15,20 +15,18 @@ const ProductPage = () => {
 
   const category = searchParams.get("category") || "all"
 
-  const allowedCategories = [
-    "men's clothing",
-    "women's clothing",
-    "tops",
-    "shirts",
-    "womens-dresses",
-  ]
+  // 1. DYNAMIC CATEGORIES: Automatically read unique categories present in your database
+  const allowedCategories = useMemo(() => {
+    const categories = products.map((p) => p.category).filter(Boolean)
+    return Array.from(new Set(categories))
+  }, [products])
 
   const filtered = useMemo(() => {
     return products.filter((p) => {
       const matchCategory = category === "all" || p.category === category
       const matchSearch =
         p.name.toLowerCase().includes(search.toLowerCase()) ||
-        p.category.toLowerCase().includes(search.toLowerCase())
+        (p.category && p.category.toLowerCase().includes(search.toLowerCase()))
       const matchPrice = p.price <= maxPrice
       return matchCategory && matchSearch && matchPrice
     })
@@ -64,7 +62,7 @@ const ProductPage = () => {
             <button
               key={cat}
               onClick={() => setCategory(cat)}
-              className={`block w-full text-left p-2 mt-1 rounded ${
+              className={`block w-full text-left p-2 mt-1 rounded capitalize ${
                 category === cat ? "bg-amber-600 text-white" : "hover:bg-gray-100"
               }`}
             >
@@ -83,7 +81,7 @@ const ProductPage = () => {
         </div>
       </div>
 
-      {/* PRODUCTS */}
+      {/* PRODUCTS PANEL */}
       <div className="flex-1 p-5">
         <h1 className="text-2xl font-bold mb-6">Fashion Store</h1>
 
@@ -97,29 +95,34 @@ const ProductPage = () => {
 
         {!loading && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-            {filtered.map((p) => (
-              <div
-                key={p._id}
-                onClick={() => navigate(`/products/${p._id}`)}
-                className="group bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-xl hover:border-black transition-all duration-300 cursor-pointer"
-              >
-                <div className="h-44 overflow-hidden">
-                  <img src={p.image} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition" />
+            {filtered.map((p) => {
+              // 2. SUPPORT DATABASE IDs: Fallback safely between .id and ._id
+              const productId = p.id || p._id;
+              
+              return (
+                <div
+                  key={productId}
+                  onClick={() => navigate(`/products/${productId}`)}
+                  className="group bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-xl hover:border-black transition-all duration-300 cursor-pointer"
+                >
+                  <div className="h-44 overflow-hidden">
+                    <img src={p.image || "/placeholder.jpg"} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition" />
+                  </div>
+                  <div className="p-3">
+                    <h2 className="font-semibold text-sm line-clamp-1">{p.name}</h2>
+                    <p className="text-xs text-gray-500 line-clamp-2">{p.description}</p>
+                    <p className="font-bold mt-2">₦{p.price}</p>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); addToCart(p) }}
+                      className="mt-3 w-full flex items-center justify-center gap-2 bg-amber-600 text-white py-2 rounded-lg hover:bg-green-900 active:scale-95 transition"
+                    >
+                      <ShoppingCart size={16} />
+                      Add to Cart
+                    </button>
+                  </div>
                 </div>
-                <div className="p-3">
-                  <h2 className="font-semibold text-sm line-clamp-1">{p.name}</h2>
-                  <p className="text-xs text-gray-500 line-clamp-2">{p.description}</p>
-                  <p className="font-bold mt-2">₦{p.price}</p>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); addToCart(p) }}
-                    className="mt-3 w-full flex items-center justify-center gap-2 bg-amber-600 text-white py-2 rounded-lg hover:bg-green-900 active:scale-95 transition"
-                  >
-                    <ShoppingCart size={16} />
-                    Add to Cart
-                  </button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
 

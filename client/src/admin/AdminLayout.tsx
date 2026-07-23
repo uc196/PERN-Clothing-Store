@@ -1,8 +1,10 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, Navigate } from "react-router-dom"; // 👈 Added Navigate here
 import { PlusIcon, PackageSearchIcon, ShoppingBagIcon, LogOutIcon, BarChart3Icon, ShieldIcon, Truck } from "lucide-react";
 import Navbar from "../components/NavBar";
+import { useAuth } from "../context/authcontext";
 
 export default function AdminLayout() {
+    const { user, loading } = useAuth(); // 👈 Destructure loading if your context tracks it
 
     const AdminLinkData = [
         { to: "/admin", label: "Dashboard", icon: BarChart3Icon },
@@ -11,7 +13,18 @@ export default function AdminLayout() {
         { to: "/admin/orders", label: "Orders", icon: ShoppingBagIcon },
         { to: "/admin/delivery-partners", label: "Delivery Partners", icon: Truck },
         { to: "/", label: "Exit", icon: LogOutIcon },
-    ]
+    ];
+
+    // 1. Optional: Handle a loading state so the page doesn't kick them out 
+    // before the auth context finished fetching the user session from localStorage/API
+    if (loading) {
+        return <div className="h-screen flex items-center justify-center">Loading...</div>;
+    }
+
+    // 2. The Protection Check: If no user is logged in OR they aren't marked as an admin, kick them out
+    if (!user || !user.isAdmin) {
+        return <Navigate to="/" replace />;
+    }
 
     return (
         <div className="h-screen overflow-hidden">
@@ -27,7 +40,6 @@ export default function AdminLayout() {
                         </h2>
                     </div>
                     <nav className="flex flex-col gap-1.5">
-
                         {AdminLinkData.map((link) => (
                             <NavLink
                                 key={link.to}
